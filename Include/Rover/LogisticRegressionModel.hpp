@@ -17,12 +17,12 @@ namespace Rover {
       /** The type of scalar to use. */
       using Scalar = S;
 
-      /** The type used for the vector of parameters or regressors. */
+      /** The type used for the vector of parameters or point. */
       using Vector = Eigen::VectorX<Scalar>;
 
       /**
        * Constructs a LogisticRegressionModel.
-       * @param parameters The parameters to the linear regression model.
+       * @param parameters The parameters to the logistic regression model.
        */
       explicit LogisticRegressionModel(Vector parameters);
 
@@ -30,12 +30,11 @@ namespace Rover {
       const Vector& get_parameters() const;
 
       /**
-       * Evaluates this model on a list of regressors.
-       * @param regressors The list of regressors to evaluate.
-       * @return The evaluation of this model to the specified
-       *         <i>regressor</i>s.
+       * Evaluates this model at a point.
+       * @param point The point to evaluate.
+       * @return The evaluation of this model at the specified <i>point</i>.
        */
-      Scalar evaluate(const Vector& regressors) const;
+      Scalar evaluate(const Vector& point) const;
 
     private:
       Vector m_parameters;
@@ -75,9 +74,9 @@ namespace Rover {
 
   template<typename S>
   LogisticRegressionModel<S>::Scalar
-      LogisticRegressionModel<S>::evaluate(const Vector& regressors) const {
+      LogisticRegressionModel<S>::evaluate(const Vector& point) const {
     auto z = m_parameters(1) +
-      m_parameters.head(m_parameters.size() - 1).dot(regressors);
+      m_parameters.head(m_parameters.size() - 1).dot(point);
     return static_cast<Scalar>(1) / (static_cast<Scalar>(1) + std::exp(-z));
   }
 }

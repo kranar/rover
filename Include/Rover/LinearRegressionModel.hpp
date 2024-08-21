@@ -15,7 +15,7 @@ namespace Rover {
       /** The type of scalar to use. */
       using Scalar = S;
 
-      /** The type used for the vector of parameters or regressors. */
+      /** The type used for the vector of parameters or point. */
       using Vector = Eigen::VectorX<Scalar>;
 
       /**
@@ -28,12 +28,11 @@ namespace Rover {
       const Vector& get_parameters() const;
 
       /**
-       * Evaluates this model on a list of regressors.
-       * @param regressors The list of regressors to evaluate.
-       * @return The evaluation of this model to the specified
-       *         <i>regressor</i>s.
+       * Evaluates this model at a point.
+       * @param point The point to evaluate.
+       * @return The evaluation of this model at the specified <i>point</i>.
        */
-      Scalar evaluate(const Vector& regressors) const;
+      Scalar evaluate(const Vector& point) const;
 
     private:
       Vector m_parameters;
@@ -70,9 +69,9 @@ namespace Rover {
 
   template<typename S>
   LinearRegressionModel<S>::Scalar
-      LinearRegressionModel<S>::evaluate(const Vector& regressors) const {
+      LinearRegressionModel<S>::evaluate(const Vector& point) const {
     return m_parameters(0) +
-      m_parameters.tail(m_parameters.size() - 1).dot(regressors);
+      m_parameters.tail(m_parameters.size() - 1).dot(point);
   }
 }
 
