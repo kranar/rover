@@ -2,6 +2,7 @@
 #define ROVER_LOGISTIC_REGRESSION_MODEL_HPP
 #include <cmath>
 #include <Eigen/Dense>
+#include "Rover/Optimizers.hpp"
 
 namespace Rover {
 
@@ -49,22 +50,16 @@ namespace Rover {
   template<typename Scalar>
   LogisticRegressionModel<Scalar> train_logistic_regression_model(
       const Eigen::MatrixX<Scalar>& sample) {
-    using Vector = typename LogisticRegressionModel<Scalar>::Vector;
     auto points = Eigen::MatrixX<Scalar>(sample.leftCols(sample.cols() - 1));
     auto targets = sample.rightCols(1);
     points.conservativeResize(points.rows(), points.cols() + 1);
     points.col(points.cols() - 1).setOnes();
-    auto parameters = Vector(Vector::Zero(points.cols()));
-    static const auto RATE = 0.001;
-    static const auto ITERATIONS = 100000;
-    auto sample_size = points.rows();
-    for(auto i = 0; i < ITERATIONS; ++i) {
+    auto parameters = gradient_descent<Scalar>([&] (const auto& parameters) {
       auto predictions = (points * parameters).unaryExpr([] (auto z) {
         return static_cast<Scalar>(1) / (static_cast<Scalar>(1) + std::exp(-z));
       });
-      parameters -=
-        RATE * (points.transpose() * (predictions - targets) / sample_size);
-    }
+      return (points.transpose() * (predictions - targets)) / points.rows();
+    }, static_cast<int>(points.cols()));
     return LogisticRegressionModel(std::move(parameters));
   }
 
