@@ -8,4 +8,4 @@ set(ROVER_SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../Source")
 set(DOCTEST_INCLUDE_PATH "${PROJECT_BINARY_DIR}/Dependencies/doctest-2.4.9")
 set(EIGEN_INCLUDE_PATH "${PROJECT_BINARY_DIR}/Dependencies/eigen-3.4.0")
 set(PYBIND11_INCLUDE_PATH
-  "${PROJECT_BINARY_DIR}/Dependencies/pybind11-2.10.3/include")
+  "${PROJECT_BINARY_DIR}/Dependencies/pybind11-2.12.0/include")

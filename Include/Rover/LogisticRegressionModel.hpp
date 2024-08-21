@@ -55,15 +55,15 @@ namespace Rover {
     points.conservativeResize(points.rows(), points.cols() + 1);
     points.col(points.cols() - 1).setOnes();
     auto parameters = Vector(Vector::Zero(points.cols()));
-    static const auto RATE = 0.01;
-    static const auto ITERATIONS = 1000;
+    static const auto RATE = 0.001;
+    static const auto ITERATIONS = 100000;
     auto sample_size = points.rows();
     for(auto i = 0; i < ITERATIONS; ++i) {
       auto predictions = (points * parameters).unaryExpr([] (auto z) {
         return static_cast<Scalar>(1) / (static_cast<Scalar>(1) + std::exp(-z));
       });
       parameters -=
-        RATE * points.transpose() * (predictions - targets) / sample_size;
+        RATE * (points.transpose() * (predictions - targets) / sample_size);
     }
     return LogisticRegressionModel(std::move(parameters));
   }
@@ -81,8 +81,9 @@ namespace Rover {
   template<typename S>
   LogisticRegressionModel<S>::Scalar
       LogisticRegressionModel<S>::evaluate(const Vector& regressors) const {
-    return static_cast<Scalar>(1) /
-      (static_cast<Scalar>(1) + std::exp(-m_parameters.dot(regressors)));
+    auto z = m_parameters(1) +
+      m_parameters.head(m_parameters.size() - 1).dot(regressors);
+    return static_cast<Scalar>(1) / (static_cast<Scalar>(1) + std::exp(-z));
   }
 }
 

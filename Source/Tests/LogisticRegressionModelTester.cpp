@@ -16,9 +16,10 @@ TEST_SUITE("LogisticRegressionModel") {
     auto parameters = VectorXd(3);
     parameters << 0.5, -1.0, 2.0;
     auto model = LogisticRegressionModel(parameters);
-    auto regressors = VectorXd(3);
-    regressors << 1.0, 2.0, -1.0;
-    auto z = parameters.dot(regressors);
+    auto regressors = VectorXd(2);
+    regressors << 1.0, 2.0;
+    auto z = parameters(1) +
+      parameters.head(parameters.size() - 1).dot(regressors);
     auto expected = 1 / (1 + std::exp(-z));
     CHECK(
       model.evaluate(regressors) == doctest::Approx(expected).epsilon(1e-6));
@@ -27,8 +28,8 @@ TEST_SUITE("LogisticRegressionModel") {
   TEST_CASE("zero") {
     auto parameters = VectorXd(VectorXd::Zero(3));
     auto model = LogisticRegressionModel(parameters);
-    auto regressors = VectorXd(3);
-    regressors << 1.0, 2.0, -1.0;
+    auto regressors = VectorXd(2);
+    regressors << 1.0, 2.0;
     CHECK(model.evaluate(regressors) == doctest::Approx(0.5).epsilon(1e-6));
   }
 
@@ -39,10 +40,10 @@ TEST_SUITE("LogisticRegressionModel") {
               4, 5, 1,
               5, 6, 1;
     auto model = train_logistic_regression_model(sample);
-    auto regressors_0 = VectorXd(3);
-    regressors_0 << 1, 2, 1;
-    auto regressors_1 = VectorXd(3);
-    regressors_1 << 4, 5, 1;
+    auto regressors_0 = VectorXd(2);
+    regressors_0 << 1, 2;
+    auto regressors_1 = VectorXd(2);
+    regressors_1 << 4, 5;
     CHECK(model.evaluate(regressors_0) < 0.5);
     CHECK(model.evaluate(regressors_1) > 0.5);
   }

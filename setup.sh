@@ -30,14 +30,14 @@ if [ ! -d "doctest-2.4.9" ]; then
   fi
   rm -f v2.4.9.zip
 fi
-if [ ! -d "pybind11-2.10.3" ]; then
-  wget https://github.com/pybind/pybind11/archive/refs/tags/v2.10.3.zip -O pybind11-2.10.3.zip --no-check-certificate
+if [ ! -d "pybind11-2.12.0" ]; then
+  wget https://github.com/pybind/pybind11/archive/refs/tags/v2.12.0.zip -O pybind11-2.12.0.zip --no-check-certificate
   if [ "$?" == "0" ]; then
-    unzip pybind11-2.10.3.zip
+    unzip pybind11-2.12.0.zip
   else
     exit_status=1
   fi
-  rm -f pybind11-2.10.3.zip
+  rm -f pybind11-2.12.0.zip
 fi
 if [ ! -d "Python-3.10.6" ]; then
   wget https://www.python.org/ftp/python/3.10.6/Python-3.10.6.tgz --no-check-certificate
