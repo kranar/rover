@@ -24,7 +24,8 @@ namespace Rover {
       .def(pybind11::init<typename Model::Vector>())
       .def_property_readonly("parameters", &Model::get_parameters)
       .def("evaluate", &Model::evaluate);
-    module.def("train", &train_logistic_regression_model<S>);
+    module.def(
+      "train_logistic_regression_model", &train_logistic_regression_model<S>);
   }
 }
 
