@@ -33,7 +33,7 @@ TEST_SUITE("LinearRegressionModel") {
   TEST_CASE("train_zero_intercept") {
     auto sample = MatrixXf(3, 2);
     sample << 1, 1, 2, 2, 3, 3;
-    auto model = train(sample);
+    auto model = train_linear_regression_model(sample);
     auto regressors = VectorXf(1);
     regressors << 5.0f;
     auto result = model.evaluate(regressors);
@@ -43,7 +43,7 @@ TEST_SUITE("LinearRegressionModel") {
   TEST_CASE("train_with_intercept") {
     auto sample = MatrixXf(3, 2);
     sample << 3, 4, 4, 5, 5, 6;
-    auto model = train(sample);
+    auto model = train_linear_regression_model(sample);
     auto regressors = VectorXf(1);
     regressors << 9.0f;
     auto result = model.evaluate(regressors);

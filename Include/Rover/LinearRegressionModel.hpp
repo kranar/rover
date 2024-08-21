@@ -46,7 +46,8 @@ namespace Rover {
    *         ordinary least squares.
    */
   template<typename Scalar>
-  LinearRegressionModel<Scalar> train(const Eigen::MatrixX<Scalar>& sample) {
+  LinearRegressionModel<Scalar> train_linear_regression_model(
+      const Eigen::MatrixX<Scalar>& sample) {
     auto points = sample.leftCols(sample.cols() - 1);
     auto targets = sample.rightCols(1);
     auto intercepts = Eigen::MatrixX<Scalar>(points.rows(), points.cols() + 1);
