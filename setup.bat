@@ -37,21 +37,21 @@ IF NOT EXIST pybind11-2.10.3 (
   )
   DEL /F /Q pybind11-2.10.3.zip
 )
-IF NOT EXIST Python-3.11.1 (
-  wget https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz --no-check-certificate
+IF NOT EXIST Python-3.12.5 (
+  wget https://www.python.org/ftp/python/3.12.5/Python-3.12.5.tgz --no-check-certificate
   IF !ERRORLEVEL! LEQ 0 (
-    gzip -d -c Python-3.11.1.tgz | tar -xf -
-    PUSHD Python-3.11.1
+    gzip -d -c Python-3.12.5.tgz | tar -xf -
+    PUSHD Python-3.12.5
     PUSHD PCbuild
-    CALL build.bat -c Debug -p Win32
-    CALL build.bat -c Release -p Win32
+    CALL build.bat -c Debug
+    CALL build.bat -c Release
     POPD
     COPY PC\pyconfig.h Include
     POPD
   ) ELSE (
     SET EXIT_STATUS=1
   )
-  DEL /F /Q Python-3.11.1.tgz
+  DEL /F /Q Python-3.12.5.tgz
 )
 IF NOT EXIST eigen-3.4.0 (
   wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz --no-check-certificate
