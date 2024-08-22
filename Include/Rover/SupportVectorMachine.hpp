@@ -45,23 +45,21 @@ namespace Rover {
       const Eigen::MatrixX<Scalar>& sample) {
     auto points = sample.leftCols(sample.cols() - 1);
     auto targets = sample.rightCols(1);
-    auto parameters =
-      Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Zero(points.cols() + 1));
-    auto learning_rate = Scalar(0.01);
-    auto max_iterations = 1000;
-    for(int i = 0; i < max_iterations; ++i) {
-      for(int j = 0; j < points.rows(); ++j) {
-        auto x_i = points.row(j).transpose();
-        auto y_i = targets(j, 0);
+    auto parameters = gradient_descent<Scalar>([&] (const auto& parameters) {
+      auto grad =
+        Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Zero(parameters.size()));
+      for(auto i = 0; i < points.rows(); ++i) {
+        auto x_i = points.row(i).transpose();
+        auto y_i = targets(i, 0);
         auto extended_point = Eigen::VectorX<Scalar>(x_i.size() + 1);
         extended_point << 1, x_i;
-        if(y_i * (parameters.dot(extended_point)) < 1) {
-          parameters += learning_rate * y_i * extended_point;
+        if (y_i * (parameters.dot(extended_point)) < 1) {
+          grad += -y_i * extended_point;
         }
       }
-      parameters.tail(points.cols()) -=
-        learning_rate * parameters.tail(points.cols());
-    }
+      grad.tail(points.cols()) += parameters.tail(points.cols());
+      return grad;
+    }, static_cast<int>(points.cols()) + 1);
     return SupportVectorMachine(std::move(parameters));
   }
 
