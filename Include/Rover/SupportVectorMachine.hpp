@@ -46,19 +46,19 @@ namespace Rover {
     auto points = sample.leftCols(sample.cols() - 1);
     auto targets = sample.rightCols(1);
     auto parameters = gradient_descent<Scalar>([&] (const auto& parameters) {
-      auto grad =
+      auto gradient =
         Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Zero(parameters.size()));
       for(auto i = 0; i < points.rows(); ++i) {
         auto x_i = points.row(i).transpose();
         auto y_i = targets(i, 0);
         auto extended_point = Eigen::VectorX<Scalar>(x_i.size() + 1);
         extended_point << 1, x_i;
-        if (y_i * (parameters.dot(extended_point)) < 1) {
-          grad += -y_i * extended_point;
+        if(y_i * (parameters.dot(extended_point)) < 1) {
+          gradient += -y_i * extended_point;
         }
       }
-      grad.tail(points.cols()) += parameters.tail(points.cols());
-      return grad;
+      gradient.tail(points.cols()) += parameters.tail(points.cols());
+      return gradient;
     }, static_cast<int>(points.cols()) + 1);
     return SupportVectorMachine(std::move(parameters));
   }
