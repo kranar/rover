@@ -45,21 +45,23 @@ namespace Rover {
       const Eigen::MatrixX<Scalar>& sample) {
     auto points = sample.leftCols(sample.cols() - 1);
     auto targets = sample.rightCols(1);
-    auto parameters = gradient_descent<Scalar>([&] (const auto& parameters) {
-      auto gradient =
-        Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Zero(parameters.size()));
-      for(auto i = 0; i < points.rows(); ++i) {
-        auto x_i = points.row(i).transpose();
-        auto y_i = targets(i, 0);
-        auto extended_point = Eigen::VectorX<Scalar>(x_i.size() + 1);
-        extended_point << 1, x_i;
-        if(y_i * (parameters.dot(extended_point)) < 1) {
-          gradient += -y_i * extended_point;
-        }
-      }
-      gradient.tail(points.cols()) += parameters.tail(points.cols());
-      return gradient;
-    }, static_cast<int>(points.cols()) + 1);
+    auto K = points * points.transpose();
+    auto A = Eigen::MatrixX<Scalar>(sample.rows() + 1, sample.rows() + 1);
+    A.topLeftCorner(sample.rows(), sample.rows()) =
+      K.cwiseProduct(targets * targets.transpose());
+    A.topRightCorner(sample.rows(), 1) = targets;
+    A.bottomLeftCorner(1, sample.rows()) = targets.transpose();
+    A(sample.rows(), sample.rows()) = 0;
+    auto b =
+      Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Ones(sample.rows() + 1));
+    b(sample.rows()) = 0;
+    auto solution = Eigen::VectorX<Scalar>(A.colPivHouseholderQr().solve(b));
+    auto alphas = solution.head(sample.rows());
+    auto bias = solution(sample.rows());
+    auto w = (alphas.cwiseProduct(targets).transpose() * points).transpose();
+    auto parameters = Eigen::VectorX<Scalar>(sample.cols());
+    parameters(0) = bias;
+    parameters.tail(sample.cols() - 1) = w;
     return SupportVectorMachine(std::move(parameters));
   }
 
