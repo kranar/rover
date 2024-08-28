@@ -34,4 +34,19 @@ TEST_SUITE("SupportVectorMachine") {
     p4 << -2.0, -3.0;
     REQUIRE(!model.evaluate(p4));
   }
+
+  TEST_CASE("train2") {
+    auto sample = Eigen::MatrixXd(10, 3);
+    sample << 1.0, 2.0, 1.0,
+              2.0, 3.0, 1.0,
+              3.0, 3.0, 1.0,
+              4.0, 5.0, 1.0,
+              5.0, 1.0, 1.0,
+              7.0, 8.0, -1.0,
+              8.0, 7.0, -1.0,
+              9.0, 6.0, -1.0,
+              6.0, 9.0, -1.0,
+              8.0, 9.0, -1.0;
+    auto model = train_support_vector_machine(sample);
+  }
 }

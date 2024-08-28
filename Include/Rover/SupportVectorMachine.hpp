@@ -1,5 +1,6 @@
 #ifndef ROVER_SUPPORT_VECTOR_MACHINE_HPP
 #define ROVER_SUPPORT_VECTOR_MACHINE_HPP
+#include <iostream>
 #include <Eigen/Dense>
 #include "Rover/Optimizers.hpp"
 
@@ -45,6 +46,41 @@ namespace Rover {
       const Eigen::MatrixX<Scalar>& sample) {
     auto points = sample.leftCols(sample.cols() - 1);
     auto targets = sample.rightCols(1);
+    auto x_dot = points * points.transpose();
+    auto y_dot = targets * targets.transpose();
+    auto alpha =
+      Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Zero(points.rows()));
+    auto iterations = 10000;
+    auto rate = 0.001;
+    for(auto z = 0; z != iterations; ++z) {
+      for(auto i = 0; i != points.rows(); ++i) {
+        auto gradient = Scalar(1);
+        for(auto j = 0; j != points.rows(); ++j) {
+          gradient -= alpha(j) * y_dot(j) * x_dot(j);
+        }
+        alpha(i) = std::max(Scalar(0), alpha(i) + rate * gradient);
+      }
+      auto is_satisfied = false;
+      while(!is_satisfied) {
+        is_satisfied = true;
+        auto error = Scalar(0);
+        for(auto i = 0; i != points.rows(); ++i) {
+          error += alpha(i) * targets(i);
+        }
+        auto tolerance = 0.0001;
+        if(std::abs(error) > tolerance) {
+          auto sum = alpha.sum();
+          for(auto i = 0; i != alpha.rows(); ++i) {
+            alpha(i) -= (alpha(i) * targets(i) * error / sum);
+            if(alpha(i) < 0) {
+              alpha(i) = 0;
+              is_satisfied = false;
+            }
+          }
+        }
+      }
+    }
+/*
     auto K = points * points.transpose();
     auto A = Eigen::MatrixX<Scalar>(sample.rows() + 1, sample.rows() + 1);
     A.topLeftCorner(sample.rows(), sample.rows()) =
@@ -62,6 +98,9 @@ namespace Rover {
     auto parameters = Eigen::VectorX<Scalar>(sample.cols());
     parameters(0) = bias;
     parameters.tail(sample.cols() - 1) = w;
+*/
+    std::cout << alpha;
+    auto parameters = Eigen::VectorX<Scalar>(sample.cols());
     return SupportVectorMachine(std::move(parameters));
   }
 
