@@ -45,62 +45,66 @@ namespace Rover {
   SupportVectorMachine<Scalar> train_support_vector_machine(
       const Eigen::MatrixX<Scalar>& sample) {
     auto points = sample.leftCols(sample.cols() - 1);
-    auto targets = sample.rightCols(1);
+    auto targets = sample.col(sample.cols() - 1);
     auto x_dot = points * points.transpose();
     auto y_dot = targets * targets.transpose();
-    auto alpha =
+    auto alphas =
       Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Zero(points.rows()));
-    auto iterations = 10000;
-    auto rate = 0.001;
-    for(auto z = 0; z != iterations; ++z) {
-      for(auto i = 0; i != points.rows(); ++i) {
-        auto gradient = Scalar(1);
-        for(auto j = 0; j != points.rows(); ++j) {
-          gradient -= alpha(j) * y_dot(j) * x_dot(j);
-        }
-        alpha(i) = std::max(Scalar(0), alpha(i) + rate * gradient);
+    auto b = Scalar(0);
+    auto evaluator = [&] (auto i) {
+      auto sum = b;
+      for(auto j = 0; j != points.rows(); ++j) {
+        sum += alphas(j) * targets(j) * x_dot(i, j);
       }
-      auto is_satisfied = false;
-      while(!is_satisfied) {
-        is_satisfied = true;
-        auto error = Scalar(0);
-        for(auto i = 0; i != points.rows(); ++i) {
-          error += alpha(i) * targets(i);
+      return sum;
+    };
+    auto is_satisfied = false;
+    while(!is_satisfied) {
+      auto [a1, a2] = [&] {
+        auto a1 = std::rand() % points.rows();
+        auto a2 = std::rand() % points.rows();
+        while(a2 == a1) {
+          a2 = std::rand() % points.rows();
         }
-        auto tolerance = 0.0001;
-        if(std::abs(error) > tolerance) {
-          auto sum = alpha.sum();
-          for(auto i = 0; i != alpha.rows(); ++i) {
-            alpha(i) -= (alpha(i) * targets(i) * error / sum);
-            if(alpha(i) < 0) {
-              alpha(i) = 0;
+        return std::tuple(a1, a2);
+      }();
+      static const auto THRESHOLD = 0.0001;
+      auto n = x_dot(a1, a1) + x_dot(a2, a2) - 2 * x_dot(a1, a2); 
+      if(std::abs(n) >= THRESHOLD) {
+        auto e1 = evaluator(a1) - targets(a1);
+        auto e2 = evaluator(a2) - targets(a2);
+        auto next_a2 = alphas(a2) + (targets(a2) * (e1 - e2)) / n;
+        auto next_a1 =
+          alphas(a1) + targets(a1) * targets(a2) * (alphas(a2) - next_a2);
+        auto b1 = b - e1 - targets(a1) * (next_a1 - alphas(a1)) * x_dot(a1, a1) -
+          targets(a2) * (next_a2 - alphas(a2)) * x_dot(a1, a2);
+        auto b2 = b - e2 - targets(a1) * (next_a1 - alphas(a1)) * x_dot(a1, a2) -
+          targets(a2) * (next_a2 - alphas(a2)) * x_dot(a2, a2);
+        alphas(a1) = next_a1;
+        alphas(a2) = next_a2;
+        b = (b1 + b2) / 2;
+      }
+      is_satisfied = true;
+      if(std::abs(alphas.dot(targets)) >= THRESHOLD) {
+        is_satisfied = false;
+      } else {
+        for(auto i = 0; i != alphas.rows(); ++i) {
+          if(alphas(i) > THRESHOLD) {
+            if(std::abs(targets(i) * evaluator(i) - 1.0) > THRESHOLD) {
               is_satisfied = false;
+              break;
             }
+          } else if(targets(i) * evaluator(i) < THRESHOLD - 1.0) {
+            is_satisfied = false;
+            break;
           }
         }
       }
     }
-/*
-    auto K = points * points.transpose();
-    auto A = Eigen::MatrixX<Scalar>(sample.rows() + 1, sample.rows() + 1);
-    A.topLeftCorner(sample.rows(), sample.rows()) =
-      K.cwiseProduct(targets * targets.transpose());
-    A.topRightCorner(sample.rows(), 1) = targets;
-    A.bottomLeftCorner(1, sample.rows()) = targets.transpose();
-    A(sample.rows(), sample.rows()) = 0;
-    auto b =
-      Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Ones(sample.rows() + 1));
-    b(sample.rows()) = 0;
-    auto solution = Eigen::VectorX<Scalar>(A.colPivHouseholderQr().solve(b));
-    auto alphas = solution.head(sample.rows());
-    auto bias = solution(sample.rows());
     auto w = (alphas.cwiseProduct(targets).transpose() * points).transpose();
     auto parameters = Eigen::VectorX<Scalar>(sample.cols());
-    parameters(0) = bias;
+    parameters(0) = b;
     parameters.tail(sample.cols() - 1) = w;
-*/
-    std::cout << alpha;
-    auto parameters = Eigen::VectorX<Scalar>(sample.cols());
     return SupportVectorMachine(std::move(parameters));
   }
 
