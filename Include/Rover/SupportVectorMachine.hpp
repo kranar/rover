@@ -76,10 +76,10 @@ namespace Rover {
         auto next_a2 = alphas(a2) + (targets(a2) * (e1 - e2)) / n;
         auto next_a1 =
           alphas(a1) + targets(a1) * targets(a2) * (alphas(a2) - next_a2);
-        auto b1 = b - e1 - targets(a1) * (next_a1 - alphas(a1)) * x_dot(a1, a1) -
-          targets(a2) * (next_a2 - alphas(a2)) * x_dot(a1, a2);
-        auto b2 = b - e2 - targets(a1) * (next_a1 - alphas(a1)) * x_dot(a1, a2) -
-          targets(a2) * (next_a2 - alphas(a2)) * x_dot(a2, a2);
+        auto b1 = b - e1 - targets(a1) * (next_a1 - alphas(a1)) *
+          x_dot(a1, a1) - targets(a2) * (next_a2 - alphas(a2)) * x_dot(a1, a2);
+        auto b2 = b - e2 - targets(a1) * (next_a1 - alphas(a1)) *
+          x_dot(a1, a2) - targets(a2) * (next_a2 - alphas(a2)) * x_dot(a2, a2);
         alphas(a1) = next_a1;
         alphas(a2) = next_a2;
         b = (b1 + b2) / 2;
