@@ -1,6 +1,5 @@
 #ifndef ROVER_SUPPORT_VECTOR_MACHINE_HPP
 #define ROVER_SUPPORT_VECTOR_MACHINE_HPP
-#include <iostream>
 #include <Eigen/Dense>
 #include "Rover/Optimizers.hpp"
 
@@ -68,7 +67,7 @@ namespace Rover {
         }
         return std::tuple(a1, a2);
       }();
-      static const auto THRESHOLD = 0.0001;
+      static const auto THRESHOLD = 0.000001;
       auto n = x_dot(a1, a1) + x_dot(a2, a2) - 2 * x_dot(a1, a2); 
       if(std::abs(n) >= THRESHOLD) {
         auto e1 = evaluator(a1) - targets(a1);

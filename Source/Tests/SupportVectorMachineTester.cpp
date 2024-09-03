@@ -1,4 +1,5 @@
 #include <doctest/doctest.h>
+#include <iostream>
 #include "Rover/SupportVectorMachine.hpp"
 
 using namespace Eigen;
@@ -36,17 +37,12 @@ TEST_SUITE("SupportVectorMachine") {
   }
 
   TEST_CASE("train2") {
-    auto sample = Eigen::MatrixXd(10, 3);
-    sample << 1.0, 2.0, 1.0,
-              2.0, 3.0, 1.0,
-              3.0, 3.0, 1.0,
-              4.0, 5.0, 1.0,
-              5.0, 1.0, 1.0,
-              7.0, 8.0, -1.0,
-              8.0, 7.0, -1.0,
-              9.0, 6.0, -1.0,
-              6.0, 9.0, -1.0,
-              8.0, 9.0, -1.0;
+    auto sample = Eigen::MatrixXd(4, 3);
+    sample << 1.0, 1.0, -1.0,
+              2.0, 3.0, -1.0,
+              4.0, 4.0, 1.0,
+              5.0, 2.0, 1.0;
     auto model = train_support_vector_machine(sample);
+    std::cout << model.get_parameters();
   }
 }
