@@ -70,9 +70,14 @@ namespace Rover {
       static const auto THRESHOLD = 0.000001;
       auto n = x_dot(a1, a1) + x_dot(a2, a2) - 2 * x_dot(a1, a2); 
       if(std::abs(n) >= THRESHOLD) {
+        auto zeta = targets.dot(alphas) - targets(a1) * alphas(a1) -
+          targets(a2) - alphas(a2);
         auto e1 = evaluator(a1) - targets(a1);
         auto e2 = evaluator(a2) - targets(a2);
         auto next_a2 = alphas(a2) + (targets(a2) * (e1 - e2)) / n;
+        if(targets(a1) != targets(a2)) {
+          next_a2 = std::max(next_a2, std::max(0, alphas(a2) - alphas(a1)));
+        }
         auto next_a1 =
           alphas(a1) + targets(a1) * targets(a2) * (alphas(a2) - next_a2);
         auto b1 = b - e1 - targets(a1) * (next_a1 - alphas(a1)) *
