@@ -73,13 +73,18 @@ namespace Rover {
         auto e1 = evaluator(a1) - targets(a1);
         auto e2 = evaluator(a2) - targets(a2);
         auto next_a2 = alphas(a2) + (targets(a2) * (e1 - e2)) / n;
-        auto zeta = [&] {
-          if(targets(a1) == targets(a2)) {
-            return targets(a1) * (alpha(a1) + alpha(a2));
-          }
-          return targets(a1) * (alpha(a1) - alpha(a2));
-        }();
-        next_a2 = std::max(0, std::min(next_a2, zeta));
+        if(targets(a1) != targets(a2)) {
+          next_a2 =
+            std::max(next_a2, std::max(Scalar(0), alphas(a2) - alphas(a1)));
+        } else {
+          next_a2 =
+            std::max(Scalar(0), std::min(next_a2, alphas(a2) + alphas(a1)));
+        }
+        if(std::abs(next_a2 - alphas(a2)) >= 0.001) {
+          is_satisfied = false;
+        } else {
+          is_satisfied = true;
+        }
         auto next_a1 =
           alphas(a1) + targets(a1) * targets(a2) * (alphas(a2) - next_a2);
         auto b1 = b - e1 - targets(a1) * (next_a1 - alphas(a1)) *
@@ -90,7 +95,6 @@ namespace Rover {
         alphas(a2) = next_a2;
         b = (b1 + b2) / 2;
       }
-      is_satisfied = true;
       if(std::abs(alphas.dot(targets)) >= THRESHOLD) {
         is_satisfied = false;
       } else {
