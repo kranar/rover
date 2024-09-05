@@ -58,7 +58,9 @@ namespace Rover {
       return sum;
     };
     auto is_satisfied = false;
+    auto i = 0;
     while(!is_satisfied) {
+      ++i;
       auto [a1, a2] = [&] {
         auto a1 = std::rand() % points.rows();
         auto a2 = std::rand() % points.rows();
@@ -80,11 +82,6 @@ namespace Rover {
           next_a2 =
             std::max(Scalar(0), std::min(next_a2, alphas(a2) + alphas(a1)));
         }
-        if(std::abs(next_a2 - alphas(a2)) >= 0.001) {
-          is_satisfied = false;
-        } else {
-          is_satisfied = true;
-        }
         auto next_a1 =
           alphas(a1) + targets(a1) * targets(a2) * (alphas(a2) - next_a2);
         auto b1 = b - e1 - targets(a1) * (next_a1 - alphas(a1)) *
@@ -95,16 +92,12 @@ namespace Rover {
         alphas(a2) = next_a2;
         b = (b1 + b2) / 2;
       }
-      if(std::abs(alphas.dot(targets)) >= THRESHOLD) {
-        is_satisfied = false;
-      } else {
-        for(auto i = 0; i != alphas.rows(); ++i) {
-          if(alphas(i) > THRESHOLD) {
-            if(std::abs(targets(i) * evaluator(i) - 1.0) > THRESHOLD) {
-              is_satisfied = false;
-              break;
-            }
-          } else if(targets(i) * evaluator(i) < THRESHOLD - 1.0) {
+      is_satisfied = true;
+      if(i < 5000) {
+        for(auto i = 0; i < points.rows(); ++i) {
+          auto y = evaluator(i);
+          if(!((alphas(i) > 0 && std::abs(y - targets(i)) < THRESHOLD) || 
+              (alphas(i) == 0 && y * targets(i) >= 1 - THRESHOLD))) {
             is_satisfied = false;
             break;
           }

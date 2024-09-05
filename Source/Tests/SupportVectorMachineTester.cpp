@@ -43,6 +43,8 @@ TEST_SUITE("SupportVectorMachine") {
               4.0, 4.0, 1.0,
               5.0, 2.0, 1.0;
     auto model = train_support_vector_machine(sample);
-    std::cout << model.get_parameters();
+    REQUIRE(model.get_parameters()[0] == doctest::Approx(-3.8));
+    REQUIRE(model.get_parameters()[1] == doctest::Approx(0.8));
+    REQUIRE(model.get_parameters()[2] == doctest::Approx(0.4));
   }
 }
