@@ -2,5 +2,7 @@
 #define ROVER_HPP
 #include "Rover/LinearRegressionModel.hpp"
 #include "Rover/LogisticRegressionModel.hpp"
+#include "Rover/Perceptron.hpp"
+#include "Rover/SupportVectorMachine.hpp"
 
 #endif

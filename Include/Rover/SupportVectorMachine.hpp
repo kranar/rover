@@ -1,7 +1,6 @@
 #ifndef ROVER_SUPPORT_VECTOR_MACHINE_HPP
 #define ROVER_SUPPORT_VECTOR_MACHINE_HPP
 #include <Eigen/Dense>
-#include "Rover/Optimizers.hpp"
 
 namespace Rover {
 
