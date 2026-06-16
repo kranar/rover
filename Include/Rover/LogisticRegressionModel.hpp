@@ -1,6 +1,7 @@
 #ifndef ROVER_LOGISTIC_REGRESSION_MODEL_HPP
 #define ROVER_LOGISTIC_REGRESSION_MODEL_HPP
 #include <cmath>
+#include <utility>
 #include <Eigen/Dense>
 #include "Rover/Optimizers.hpp"
 
@@ -73,9 +74,9 @@ namespace Rover {
   }
 
   template<typename S>
-  LogisticRegressionModel<S>::Scalar
+  typename LogisticRegressionModel<S>::Scalar
       LogisticRegressionModel<S>::evaluate(const Vector& point) const {
-    auto z = m_parameters(1) +
+    auto z = m_parameters(m_parameters.size() - 1) +
       m_parameters.head(m_parameters.size() - 1).dot(point);
     return static_cast<Scalar>(1) / (static_cast<Scalar>(1) + std::exp(-z));
   }

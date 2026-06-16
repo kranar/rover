@@ -1,5 +1,6 @@
 #ifndef ROVER_LINEAR_REGRESSION_MODEL_HPP
 #define ROVER_LINEAR_REGRESSION_MODEL_HPP
+#include <utility>
 #include <Eigen/Dense>
 
 namespace Rover {
@@ -68,7 +69,7 @@ namespace Rover {
   }
 
   template<typename S>
-  LinearRegressionModel<S>::Scalar
+  typename LinearRegressionModel<S>::Scalar
       LinearRegressionModel<S>::evaluate(const Vector& point) const {
     return m_parameters(0) +
       m_parameters.tail(m_parameters.size() - 1).dot(point);

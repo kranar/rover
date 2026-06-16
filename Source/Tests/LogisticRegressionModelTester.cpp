@@ -18,7 +18,7 @@ TEST_SUITE("LogisticRegressionModel") {
     auto model = LogisticRegressionModel(parameters);
     auto regressors = VectorXd(2);
     regressors << 1.0, 2.0;
-    auto z = parameters(1) +
+    auto z = parameters(parameters.size() - 1) +
       parameters.head(parameters.size() - 1).dot(regressors);
     auto expected = 1 / (1 + std::exp(-z));
     CHECK(
