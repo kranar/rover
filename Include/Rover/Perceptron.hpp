@@ -1,5 +1,6 @@
 #ifndef ROVER_PERCEPTRON_HPP
 #define ROVER_PERCEPTRON_HPP
+#include <utility>
 #include <Eigen/Dense>
 
 namespace Rover {
@@ -28,6 +29,12 @@ namespace Rover {
       /** Returns this model's parameters. */
       const Vector& get_parameters() const;
 
+      /**
+       * Classifies a point.
+       * @param point The point to classify.
+       * @return <code>true</code> iff the <i>point</i> belongs to the positive
+       *         class.
+       */
       bool evaluate(const Vector& point) const;
 
     private:
