@@ -6,7 +6,6 @@
 #include <tuple>
 #include <utility>
 #include <Eigen/Dense>
-#include "Rover/Optimizers.hpp"
 
 namespace Rover {
 
