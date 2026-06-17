@@ -1,5 +1,10 @@
 #ifndef ROVER_SUPPORT_VECTOR_MACHINE_HPP
 #define ROVER_SUPPORT_VECTOR_MACHINE_HPP
+#include <algorithm>
+#include <cmath>
+#include <random>
+#include <tuple>
+#include <utility>
 #include <Eigen/Dense>
 
 namespace Rover {
@@ -28,6 +33,12 @@ namespace Rover {
       /** Returns this model's parameters. */
       const Vector& get_parameters() const;
 
+      /**
+       * Classifies a point.
+       * @param point The point to classify.
+       * @return <code>true</code> iff the <i>point</i> belongs to the positive
+       *         class.
+       */
       bool evaluate(const Vector& point) const;
 
     private:
@@ -44,8 +55,7 @@ namespace Rover {
       const Eigen::MatrixX<Scalar>& sample) {
     auto points = sample.leftCols(sample.cols() - 1);
     auto targets = sample.col(sample.cols() - 1);
-    auto x_dot = points * points.transpose();
-    auto y_dot = targets * targets.transpose();
+    auto x_dot = Eigen::MatrixX<Scalar>(points * points.transpose());
     auto alphas =
       Eigen::VectorX<Scalar>(Eigen::VectorX<Scalar>::Zero(points.rows()));
     auto b = Scalar(0);
@@ -56,15 +66,18 @@ namespace Rover {
       }
       return sum;
     };
+    auto generator = std::mt19937();
+    auto distribution =
+      std::uniform_int_distribution<Eigen::Index>(0, points.rows() - 1);
     auto is_satisfied = false;
     auto i = 0;
     while(!is_satisfied) {
       ++i;
       auto [a1, a2] = [&] {
-        auto a1 = std::rand() % points.rows();
-        auto a2 = std::rand() % points.rows();
+        auto a1 = distribution(generator);
+        auto a2 = distribution(generator);
         while(a2 == a1) {
-          a2 = std::rand() % points.rows();
+          a2 = distribution(generator);
         }
         return std::tuple(a1, a2);
       }();

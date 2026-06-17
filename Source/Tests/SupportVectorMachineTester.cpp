@@ -1,5 +1,4 @@
 #include <doctest/doctest.h>
-#include <iostream>
 #include "Rover/SupportVectorMachine.hpp"
 
 using namespace Eigen;
@@ -7,12 +6,30 @@ using namespace Rover;
 
 TEST_SUITE("SupportVectorMachine") {
   TEST_CASE("construction") {
+    auto parameters = VectorXd(3);
+    parameters << -3.8, 0.8, 0.4;
+    auto model = SupportVectorMachine(parameters);
+    REQUIRE(model.get_parameters() == parameters);
   }
 
   TEST_CASE("evaluate") {
+    auto parameters = VectorXd(3);
+    parameters << -3.8, 0.8, 0.4;
+    auto model = SupportVectorMachine(parameters);
+    auto positive = VectorXd(2);
+    positive << 4.0, 4.0;
+    REQUIRE(model.evaluate(positive));
+    auto negative = VectorXd(2);
+    negative << 1.0, 1.0;
+    REQUIRE(!model.evaluate(negative));
   }
 
   TEST_CASE("zero") {
+    auto parameters = VectorXd(VectorXd::Zero(3));
+    auto model = SupportVectorMachine(parameters);
+    auto regressors = VectorXd(2);
+    regressors << 1.0, 2.0;
+    REQUIRE(model.evaluate(regressors));
   }
 
   TEST_CASE("train") {
